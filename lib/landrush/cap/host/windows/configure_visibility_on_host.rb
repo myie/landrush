@@ -115,22 +115,22 @@ module Landrush
           # ...
           def get_network_name(ip)
             cmd_out = `netsh interface ip show config`
-            network_details = cmd_out.split(/\n\n/).select do |settings|
+            network_details = cmd_out.split(/\n\n/).reject(&:empty?).select do |settings|
               begin
                 lines = settings.split(/\n/).reject(&:empty?)
                 subnet = lines[3]
                 next false unless subnet =~ /Subnet Prefix/
-
+    
                 mask = IPAddr.new(subnet.match(%r{.* (\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}/\d{1,3}).*}).captures[0])
                 address = IPAddr.new(ip)
-
+    
                 mask.include?(address)
               rescue
                 false
               end
             end
-            return nil if network_details[0].nil?
-            network_details[0].split(/\n/)[0].match(/Configuration for interface "(.*)"/).captures[0].strip
+            return nil if network_details[0].nil? || network_details[0].empty?
+            network_details[0].split(/\n/)[1].match(/Configuration for interface "(.*)"/).captures[0].strip
           end
 
           # Makes sure that we have admin privileges and if nor starts a new shell with the required
