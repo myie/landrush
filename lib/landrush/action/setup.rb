@@ -39,7 +39,7 @@ module Landrush
         setup_static_dns
         start_server
         return unless machine.config.landrush.host_redirect_dns?
-        env[:host].capability(:configure_visibility_on_host, host_ip_address, config.tld)
+        env[:host].capability(:configure_visibility_on_host, host_ip_address, config.tld, config.network_name)
       end
 
       def record_dependent_vm

@@ -5,7 +5,7 @@ module Landrush
         class << self
           attr_writer :sudo, :config_dir
 
-          def configure_visibility_on_host(env, _ip, tld)
+          def configure_visibility_on_host(env, _ip, tld, netname)
             @env = env
             @tld = tld
             if contents_match?

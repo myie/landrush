@@ -1,6 +1,7 @@
 module Landrush
   class Config < Vagrant.plugin('2', :config)
     attr_accessor :hosts
+    attr_accessor :network_name
     attr_accessor :enabled
     attr_accessor :tld
     attr_accessor :upstream_servers
@@ -16,6 +17,7 @@ module Landrush
 
     DEFAULTS = {
       enabled:                 false,
+      network_name:                 '', 
       tld:                     'vagrant.test',
       upstream_servers:        [[:udp, '8.8.8.8', 53], [:tcp, '8.8.8.8', 53]],
       host_ip_address:         nil,
@@ -28,6 +30,7 @@ module Landrush
 
     def initialize
       @hosts                     = {}
+      @network_name              = UNSET_VALUE
       @enabled                   = UNSET_VALUE
       @tld                       = UNSET_VALUE
       @upstream_servers          = UNSET_VALUE
@@ -53,6 +56,10 @@ module Landrush
 
     def guest_redirect_dns?
       @guest_redirect_dns
+    end
+
+    def network_name?
+      @network_name
     end
 
     def host_redirect_dns?

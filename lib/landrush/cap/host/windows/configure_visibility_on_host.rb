@@ -10,9 +10,9 @@ module Landrush
         INTERFACES = 'SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces'.freeze
 
         class << self
-          def configure_visibility_on_host(env, ip, tld)
+          def configure_visibility_on_host(env, ip, tld, netname)
             @env = env
-            update_network_adapter(ip, tld) if ensure_prerequisites
+            update_network_adapter(ip, tld, netname) if ensure_prerequisites
           end
 
           # If this registry query succeeds we assume we have Admin rights
@@ -51,11 +51,12 @@ module Landrush
           end
 
           # Does the actual update of the network configuration
-          def update_network_adapter(ip, tld)
+          def update_network_adapter(ip, tld, netname)
             # Need to defer loading to ensure cross OS compatibility
             require 'win32/registry'
             if admin_mode?
-              network_name = get_network_name(ip)
+              network_name = netname
+              network_name = get_network_name(ip) if !network_name
               if network_name.nil?
                 info("unable to determine network interface for #{ip}. DNS on host cannot be configured. Try manual configuration.")
                 return
@@ -114,7 +115,7 @@ module Landrush
           # \n\n
           # ...
           def get_network_name(ip)
-            cmd_out = `netsh interface ip show config`
+            cmd_out = `netsh interface ip show config`            
             network_details = cmd_out.split(/\n\n/).reject(&:empty?).select do |settings|
               begin
                 lines = settings.split(/\n/).reject(&:empty?)
